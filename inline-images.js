@@ -4,7 +4,7 @@ const http = require('http');
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
-const util = require('gulp-util');
+const PluginError = require('plugin-error');
 const through = require('through2');
 const cheerio = require('cheerio');
 
@@ -20,7 +20,7 @@ function plugin(options = {}){
 
 	return through.obj(function(file, encoding, callback){
 		if(file.isStream()){
-			this.emit('error', new util.PluginError(PLUGIN_NAME, 'Streams are not supported!'));
+			this.emit('error', new PluginError(PLUGIN_NAME, 'Streams are not supported!'));
 			return callback();
 		}
 
@@ -46,17 +46,17 @@ function plugin(options = {}){
 
 				// Find !inline attribute
 				var not_inline_flag = $img.attr(NOT_INLINE_ATTR);
-				
+
 				if(typeof not_inline_flag !== typeof undefined && not_inline_flag !== false){
 					// Remove the tag and don't process this file
 					return $img.removeAttr(NOT_INLINE_ATTR);
 				}
-				
+
 				// Count async ops
 				count++;
 
 				getSrcBase64(options.basedir || file.base, getHTTP, src, function(err, result, res_format, skip_formatting){
-					if (err) { 
+					if (err) {
 						console.error(err);
 					} else {
 						// Need a format in and a result for this to work
@@ -132,7 +132,7 @@ function getSrcBase64(base, getHTTP, src, callback){
 		} else {
 			callback(null, src, null, true)
 		}
-	}    
+	}
 }
 
 module.exports.plugin = plugin;
